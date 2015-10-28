@@ -1,0 +1,35 @@
+python里面的descriptor:
+实现了__get__, __set__, __del__中一个或者多个方法的类的对象就称为descriptor, 各方法签名如下:
+class MyDescriptor(object):
+    ## self: MyDescriptor的实例
+    ## instance: 获取其某个属性的对象(该属性一般定义为instance的类里面一个MyDescriptor实例)
+    ## owner: 拥有MyDescriptor实例的类，一般就是type(instance)
+    def __get__(self, instance, owner):
+        pass
+    def __set__(self, instance, value):
+        pass
+    def __del__(self, instance):
+        pass
+
+同时实现了__get__和__set__方法的称为data descriptor, 只实现了__get__的称为non-data descriptor或者function descriptor。
+读取一个实例的属性，遵循如下优先级:
+类(祖先类)的__getattribute__  > 类(祖先类)的data descriptor > 实例本身的字典 > 类(祖先类)的non-data descriptor > obj.__getattr__
+具体如下:
+(1) 如果实例的类(包括祖先类但不算object)定义了__getattribute__(self, name)方法，那么调用此方法，否则下一步；
+(2) 查看实例的类(包括祖先类)的__dict__, 如果包含该属性且属性值是data descritor, 则访问该descriptor的__get__方法；否则下一步；
+(3) 查看实例的__dict__(包括祖先类实例的__dict__)，如果包含该属性，则返回属性值；否则下一步；
+(4) 再次查看实例的类(包括祖先类)的__dict__, 如果包含该属性，那么根据属性值有两种情况:
+   (4.1) 如果属性值不是descriptor(既不是data descriptor, 也不是non-data descriptor), 返回该属性值；
+   (4.2) 如果属性值是non-data descriptor(是data descriptor的话在(2)就返回了)， 则调用该non-data descriptor的__get__方法；
+(5) 如果类实例(包括祖先类)的__dict__不包含待访问属性，
+    则查看该类(包括祖先类但不算object)是否有__getattr__(self, name)方法，如果有就调用它，否则下一步；
+(6) 抛出AttributeError异常；
+
+
+设置一个实例的属性，遵循下面的优先级:
+类(祖先类)的__setattr__ > 类(祖先类)的data descriptor > 实例的字典
+具体如下:
+(1) 如果实例的类(包括祖先类)定义了__setattr__(self, name, value)方法，那么调用该方法，否则下一步；
+(2) 查看实例的类(包括祖先类)的__dict__，如果包含了该属性且属性值是data descriptor, 则访问该data descriptor的__set__方法，否则下一步；
+(3) 把属性设置到实例的__dict__里面；
+设置属性的优先级如下:
