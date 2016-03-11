@@ -23,7 +23,7 @@ def capitalizeWords():
     print(string.capwords(text))
 
 
-def simleTranslate():
+def simpleTranslate():
     text = getText()
     leet = string.maketrans('abegiloprstz', '463611092572')
     print(text.translate(leet))
@@ -70,6 +70,6 @@ def codecExample():
 if __name__ == '__main__':
     codecExample()
     capitalizeWords()
-    simleTranslate()
+    simpleTranslate()
     stringFormat()
     textWrapExample()
