@@ -8,26 +8,29 @@ import os
 import sys
 
 # a 3x3 gaussian convolution kernel converting 3 input channels to 1 output channels
-gaussian_weights_3x3 =\
+gaussian_weights_3x3 = \
     np.array([[[[0.095, 0.118, 0.095], [0.118, 0.148, 0.118], [0.095, 0.118, 0.095]],
                [[0.095, 0.118, 0.095], [0.118, 0.148, 0.118], [0.095, 0.118, 0.095]],
-               [[0.095, 0.118, 0.095], [0.118, 0.148, 0.118], [0.095, 0.118, 0.095]]]], dtype = np.float32)
+               [[0.095, 0.118, 0.095], [0.118, 0.148, 0.118], [0.095, 0.118, 0.095]]]], dtype=np.float32)
 
 # a 5x5 gaussian convolution kernel converting 3 input channels to 1 output channels
 gaussian_weights_5x5 = (1.0 / 273.0) * \
-    np.array([[[[1, 4, 7, 4, 1], [4, 16, 26, 16, 4], [7, 26, 41, 26, 7], [4, 16, 26, 16, 4], [1, 4, 7, 4, 1]],
-               [[1, 4, 7, 4, 1], [4, 16, 26, 16, 4], [7, 26, 41, 26, 7], [4, 16, 26, 16, 4], [1, 4, 7, 4, 1]],
-               [[1, 4, 7, 4, 1], [4, 16, 26, 16, 4], [7, 26, 41, 26, 7], [4, 16, 26, 16, 4], [1, 4, 7, 4, 1]]]],
-            dtype = np.float32)
+                       np.array([[[[1, 4, 7, 4, 1], [4, 16, 26, 16, 4], [7, 26, 41, 26, 7], [4, 16, 26, 16, 4],
+                                   [1, 4, 7, 4, 1]],
+                                  [[1, 4, 7, 4, 1], [4, 16, 26, 16, 4], [7, 26, 41, 26, 7], [4, 16, 26, 16, 4],
+                                   [1, 4, 7, 4, 1]],
+                                  [[1, 4, 7, 4, 1], [4, 16, 26, 16, 4], [7, 26, 41, 26, 7], [4, 16, 26, 16, 4],
+                                   [1, 4, 7, 4, 1]]]],
+                                dtype=np.float32)
+
 
 # a wrapper class for convolution parameters
 # conv_weights: each kernel in one row,
 #               should be an array of 'out_channels x in_channels x kernel_h x kernel_w'
 class ConvParameter(object):
-    def __init__(self, stride_h = 1,stride_w = 1,
-                       pad_h = 1, pad_w = 1,
-                       conv_weights = gaussian_weights_3x3):
-
+    def __init__(self, stride_h=1, stride_w=1,
+                 pad_h=1, pad_w=1,
+                 conv_weights=gaussian_weights_3x3):
         self._stride_h = stride_h
         self._stride_w = stride_w
         self._pad_h = pad_h
@@ -81,24 +84,27 @@ class ConvParameter(object):
     def conv_weights(self):
         return self._conv_weights
 
-## convert the input image (num_channels x h x w) to a matrix,
-## so that convolution can be represented as matrix multiplication.
-## input_imgs: input images of form 'num_channels x h x w'
+
+# convert the input image (num_channels x h x w) to a matrix,
+# so that convolution can be represented as matrix multiplication.
+# input_imgs: input images of form 'num_channels x h x w'
 def img2col(input_imgs, conv_param):
     input_channels, input_h, input_w = input_imgs.shape
 
-    output_h = (input_h + 2*conv_param.pad_h - conv_param.kernel_h) / conv_param.stride_h + 1
-    output_w = (input_w + 2*conv_param.pad_w - conv_param.kernel_w) / conv_param.stride_w + 1
+    output_h = (input_h + 2 * conv_param.pad_h - conv_param.kernel_h) / conv_param.stride_h + 1
+    output_w = (input_w + 2 * conv_param.pad_w - conv_param.kernel_w) / conv_param.stride_w + 1
     single_channel_output_size = output_h * output_w * conv_param.kernel_h * conv_param.kernel_w
-    output_imgs = np.empty(input_channels * single_channel_output_size, dtype = input_imgs.dtype)
+    output_imgs = np.empty(input_channels * single_channel_output_size, dtype=input_imgs.dtype)
     output_index = 0
     # pick image patch of size kernel_h x kernel_w from each channel,
     # the pick order is from left to right and top to bottom
-    for input_row_index in xrange(-conv_param.pad_h, input_h + conv_param.pad_h - conv_param.kernel_h + 1, conv_param.stride_h):
-        for input_col_index in xrange(-conv_param.pad_w, input_w + conv_param.pad_w - conv_param.kernel_w + 1, conv_param.stride_w):
-            for channel in xrange(0, input_channels):
-                for y in xrange(input_row_index, input_row_index + conv_param.kernel_h):
-                    for x in xrange(input_col_index, input_col_index + conv_param.kernel_w):
+    for input_row_index in range(-conv_param.pad_h, input_h + conv_param.pad_h - conv_param.kernel_h + 1,
+                                  conv_param.stride_h):
+        for input_col_index in range(-conv_param.pad_w, input_w + conv_param.pad_w - conv_param.kernel_w + 1,
+                                      conv_param.stride_w):
+            for channel in range(0, input_channels):
+                for y in range(input_row_index, input_row_index + conv_param.kernel_h):
+                    for x in range(input_col_index, input_col_index + conv_param.kernel_w):
                         if 0 <= y < input_h and 0 <= x < input_w:
                             output_imgs[output_index] = input_imgs[channel][y][x]
                         else:
@@ -107,6 +113,7 @@ def img2col(input_imgs, conv_param):
     output_imgs = output_imgs.reshape((-1, input_channels * conv_param.kernel_h * conv_param.kernel_w))
     # tranpose the output matrix, so that each row is a list of patches from the same location of each channel
     return output_imgs.transpose()
+
 
 # weights: convolution weights, each kernel in one row, one kernel per channel
 #          should be an array of '1 x 3 x kernel_h x kernel_w'
@@ -130,6 +137,7 @@ def rgbImageConvolution(input_img, weights):
     output_h = (input_h + 2 * conv_param.pad_h - conv_param.kernel_h) / conv_param.stride_h + 1
     out_imgs = out_imgs.reshape(out_channels, output_h, -1)
     return out_imgs
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="convolution using matrix multiplication, like the way in caffe")

@@ -5,10 +5,11 @@ import numpy as np
 
 import tensorflow as tf
 from tensorflow.python.platform import gfile
-from tensorflow.python.client import graph_util
+from tensorflow import graph_util
+
 
 def train_and_freeze_graph():
-    #####################################################################################
+    ######################################################################################
     # train a LMS model
     # generate 100 samples with Y = W * X + b, where X, Y are 2-D column vectors,
     # and W and b have following values:
@@ -21,10 +22,10 @@ def train_and_freeze_graph():
     Y_data = np.dot(W_real, X_data) + b_real
 
     # Try to find values for W and b that compute y_data = W * x_data + b
-    W = tf.Variable(tf.random_uniform([2, 2], -1.0, 1.0), name = "W_learn")
-    b = tf.Variable(tf.zeros([2, 1]), name = "b_learn")
-    x = tf.placeholder(tf.float32, [2, None], name = "x_input")
-    y = tf.add(tf.matmul(W, x), b, name = "y_guess")
+    W = tf.Variable(tf.random_uniform([2, 2], -1.0, 1.0), name="W_learn")
+    b = tf.Variable(tf.zeros([2, 1]), name="b_learn")
+    x = tf.placeholder(tf.float32, [2, None], name="x_input")
+    y = tf.add(tf.matmul(W, x), b, name="y_guess")
 
     # Minimize the mean squared errors.
     loss = tf.reduce_mean(tf.square(y - Y_data))
@@ -40,11 +41,11 @@ def train_and_freeze_graph():
     sess = tf.Session()
     sess.run(init)
 
-    for i in xrange(200):
+    for i in range(200):
         _, loss_value = sess.run([apply_grad_op, loss], feed_dict={x: X_data})
         print("loss %f" % loss_value)
 
-        ## gradients has the same shape as it's corresponding variable
+        # gradients has the same shape as it's corresponding variable
         if i % 50 == 0:
             print("=======================================")
             print("type of grads: %s, size %d" % (type(grads), len(grads)))
@@ -63,16 +64,16 @@ def train_and_freeze_graph():
 
     print("x.name %s" % x.name)
     print("y.name %s" % y.name)
-    #####################################################################################
+    ######################################################################################
 
-    #####################################################################################
+    ######################################################################################
     # freeze and save the trained model for later restoring
     # Write out the trained graph and labels with the weights stored as constants.
     output_graph_def = graph_util.convert_variables_to_constants(
         sess, sess.graph.as_graph_def(), ["x_input", "y_guess"])
     with gfile.FastGFile('draft_graph.pb', 'wb') as f:
         f.write(output_graph_def.SerializeToString())
-    #####################################################################################
+    ######################################################################################
 
 
 def create_graph():
@@ -80,6 +81,7 @@ def create_graph():
         graph_def = tf.GraphDef()
         graph_def.ParseFromString(f.read())
         _ = tf.import_graph_def(graph_def, name='')
+
 
 def restore_freezed_graph():
     create_graph()
@@ -90,6 +92,7 @@ def restore_freezed_graph():
         print(x_input)
         test_result = sess.run(y_tensor, {"x_input:0": x_input})
         print(test_result)
+
 
 if __name__ == "__main__":
     train_and_freeze_graph()

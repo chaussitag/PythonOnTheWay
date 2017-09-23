@@ -16,8 +16,8 @@ X_samples = np.random.rand(2, 100).astype(np.float32)
 Y_samples = np.dot(W_real, X_samples) + b_real
 
 # Try to find values for W and b that compute y_data = W * x_data + b
-W_learn = tf.Variable(tf.random_uniform([2, 2], -1.0, 1.0), name = "W_learn")
-b_learn = tf.Variable(tf.zeros([2, 1]), name = "b_learn")
+W_learn = tf.Variable(tf.random_uniform([2, 2], -1.0, 1.0), name="W_learn")
+b_learn = tf.Variable(tf.zeros([2, 1]), name="b_learn")
 Y_eval = tf.matmul(W_learn, X_samples) + b_learn
 
 # Minimize the mean squared errors.
@@ -34,11 +34,11 @@ init = tf.initialize_all_variables()
 with tf.Session() as sess:
     sess.run(init)
 
-    for i in xrange(200):
+    for i in range(200):
         _, loss_value = sess.run([apply_grad_op, loss])
         print("loss %f" % loss_value)
 
-        ## gradients has the same shape as it's corresponding variable
+        # gradients has the same shape as it's corresponding variable
         if i % 50 == 0:
             print("=======================================")
             print("type of grads: %s, size %d" % (type(grads), len(grads)))

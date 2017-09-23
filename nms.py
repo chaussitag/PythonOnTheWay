@@ -3,6 +3,7 @@
 
 import numpy as np
 
+
 def non_maximum_suppress(box_and_scores, thresh):
     lefts = box_and_scores[:, 0]
     bottoms = box_and_scores[:, 1]
@@ -30,6 +31,7 @@ def non_maximum_suppress(box_and_scores, thresh):
         suppressed_boxes_index = np.where(iou <= thresh)[0]
         score_order = score_order[suppressed_boxes_index + 1]
     return keep_indexes
+
 
 def test():
     boxes_and_scores = np.array([[1.0, 2.0, 4.0, 7.0, 0.88],
