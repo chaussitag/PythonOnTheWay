@@ -99,9 +99,9 @@ def img2col(input_imgs, conv_param):
     # pick image patch of size kernel_h x kernel_w from each channel,
     # the pick order is from left to right and top to bottom
     for input_row_index in range(-conv_param.pad_h, input_h + conv_param.pad_h - conv_param.kernel_h + 1,
-                                  conv_param.stride_h):
+                                 conv_param.stride_h):
         for input_col_index in range(-conv_param.pad_w, input_w + conv_param.pad_w - conv_param.kernel_w + 1,
-                                      conv_param.stride_w):
+                                     conv_param.stride_w):
             for channel in range(0, input_channels):
                 for y in range(input_row_index, input_row_index + conv_param.kernel_h):
                     for x in range(input_col_index, input_col_index + conv_param.kernel_w):
