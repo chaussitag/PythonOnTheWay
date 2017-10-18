@@ -3,16 +3,16 @@
 
 import time
 
-f = file('poem.txt')
+f = open('poem.txt')
 try:
     while True:
         line = f.readline()
         if len(line) == 0:
             break
         time.sleep(2)
-        print line,
+        print(line)
 except Exception as e:
-    print 'exception occurred: ' + str(e)
+    print('exception occurred: ' + str(e))
 finally:
     f.close()
-    print 'Cleaning up...closed the file'
+    print('Cleaning up...closed the file')

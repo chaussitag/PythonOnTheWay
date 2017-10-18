@@ -16,4 +16,4 @@ with open('poem.txt') as f:
         line = f.readline()
         if len(line) == 0:
             break
-        print line,
+        print(line)

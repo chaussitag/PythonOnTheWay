@@ -7,12 +7,12 @@ class Person:
         self.nick = nick
 
     def info(self):
-        print 'name %s, nick %s' % (self.name, self.nick)
+        print('name %s, nick %s' % (self.name, self.nick))
 
 if __name__ == "__main__":
     p = Person("NicolosLee")
     p.info()
     p = Person("NicolosLee", "Nick")
     p.info()
-    print Person.__dict__
+    print(Person.__dict__)
     print(p.__dict__)

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #coding=utf8
 
-import cPickle as p
-# import pickle as p
+#import cPickle as p
+import pickle as p
 
 shopListFile = "shoplist.data"
 
