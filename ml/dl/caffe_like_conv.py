@@ -94,7 +94,7 @@ def img2col(input_imgs, conv_param):
     output_h = (input_h + 2 * conv_param.pad_h - conv_param.kernel_h) / conv_param.stride_h + 1
     output_w = (input_w + 2 * conv_param.pad_w - conv_param.kernel_w) / conv_param.stride_w + 1
     single_channel_output_size = output_h * output_w * conv_param.kernel_h * conv_param.kernel_w
-    output_imgs = np.empty(input_channels * single_channel_output_size, dtype=input_imgs.dtype)
+    output_imgs = np.empty(int(input_channels * single_channel_output_size), dtype=input_imgs.dtype)
     output_index = 0
     # pick image patch of size kernel_h x kernel_w from each channel,
     # the pick order is from left to right and top to bottom
@@ -135,7 +135,7 @@ def rgbImageConvolution(input_img, weights):
     out_imgs = out_imgs.astype(input_img.dtype)
 
     output_h = (input_h + 2 * conv_param.pad_h - conv_param.kernel_h) / conv_param.stride_h + 1
-    out_imgs = out_imgs.reshape(out_channels, output_h, -1)
+    out_imgs = out_imgs.reshape(int(out_channels), int(output_h), -1)
     return out_imgs
 
 
