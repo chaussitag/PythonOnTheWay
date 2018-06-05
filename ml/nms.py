@@ -17,10 +17,11 @@ def non_maximum_suppress(box_and_scores, thresh):
     while score_order.size > 0:
         current_max_score_index = score_order[0]
         keep_indexes.append(current_max_score_index)
+
         intersections_lefts = np.maximum(lefts[current_max_score_index], lefts[score_order[1:]])
         intersections_bottoms = np.maximum(bottoms[current_max_score_index], bottoms[score_order[1:]])
-        intersections_rights = np.maximum(rights[current_max_score_index], rights[score_order[1:]])
-        intersections_tops = np.maximum(tops[current_max_score_index], tops[score_order[1:]])
+        intersections_rights = np.minimum(rights[current_max_score_index], rights[score_order[1:]])
+        intersections_tops = np.minimum(tops[current_max_score_index], tops[score_order[1:]])
 
         intersections_widths = np.maximum(0.0, intersections_rights - intersections_lefts + 1)
         intersections_heights = np.maximum(0.0, intersections_tops - intersections_bottoms + 1)
