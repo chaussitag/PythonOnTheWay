@@ -29,8 +29,9 @@ def non_maximum_suppress(box_and_scores, thresh):
         intersections_areas = intersections_widths * intersections_heights
         iou = intersections_areas / (box_areas[current_max_score_index]
                                      + box_areas[score_order[1:]] - intersections_areas)
-        suppressed_boxes_index = np.where(iou <= thresh)[0]
-        score_order = score_order[suppressed_boxes_index + 1]
+        ## keep boxes have IoU (with the box of highest score) less than the specified threshold
+        kept_boxes_index = np.where(iou < thresh)[0]
+        score_order = score_order[kept_boxes_index + 1]
     return keep_indexes
 
 
@@ -40,7 +41,7 @@ def test():
                                  [1.2, 2.2, 4.5, 6.5, 0.93],
                                  [1.5, 1.7, 4.3, 7.2, 0.95],
                                  [1.33, 1.85, 4.2, 7.15, 0.92]])
-    kept_indexes = non_maximum_suppress(boxes_and_scores, 0.96)
+    kept_indexes = non_maximum_suppress(boxes_and_scores, 0.45)
     print(boxes_and_scores[kept_indexes])
 
 
